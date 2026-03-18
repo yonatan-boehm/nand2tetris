@@ -44,10 +44,28 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-    // You're advised to work on the ALU chip in two steps:
-    // - First, without handling status outputs (ALU-nostat)
-    // - Then, adding the missing functionality for the "full" chip (ALU). 
-    // You only need to submit the "full" ALU, no need to submit the partial
-    // implementation (ALU-nostat).
-    // Put your code here:
+    // zx, nx
+    Mux16(a=x, b=false, sel=zx, out=zxout);
+    Not16(in=zxout, out=notx);
+    Mux16(a=zxout, b=notx, sel=nx, out=nzx);
+
+    // zy, ny
+    Mux16(a=y, b=false, sel=zy, out=zyout);
+    Not16(in=zyout, out=noty);
+    Mux16(a=zyout, b=noty, sel=ny, out=nzy);
+
+    // f
+    Add16(a=nzx, b=nzy, out=nzxpy);
+    And16(a=nzx, b=nzy, out=nzxay);
+    Mux16(a=nzxay, b=nzxpy, sel=f, out=fo);
+
+    // no -> out and ng
+    Not16(in=fo, out=nfo);
+    Mux16(a=fo, b=nfo, sel=no, out=out, out[0..7]=zr1, out[8..15]=zr2, out[15]=ng);
+
+    // zr 
+    Or8Way(in=zr1, out=o1);
+    Or8Way(in=zr2, out=o2);
+    Or(a=o1, b=o2, out=o3);
+    Not(in=o3, out=zr);
 }
