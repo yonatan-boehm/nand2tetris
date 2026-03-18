@@ -16,4 +16,28 @@
 // - Your program should not change the values stored in R0 and R1.
 // - You can implement any multiplication algorithm you want.
 
-// Put your code here.
+@R0
+D=M
+@i
+M=D
+@R2
+M=0
+(LOOP)
+    @i
+    D=M
+    @END
+    D;JEQ
+
+    @R1
+    D=M
+    @R2
+    D=D+M
+    M=D
+
+    @i
+    M=M-1
+    @LOOP
+    0;JMP
+(END)
+    @END
+    0;JMP

@@ -36,3 +36,51 @@
 //   interactively by pressing and releasing some keyboard keys
 
 // Put your code here.
+
+
+(LOOP)
+    @SCREEN
+    D=A
+    @i
+    M=D // initialize i to point to SCREEN
+    @KBD
+    D=M
+    @WHITE
+    D;JEQ // jump to WHITE if KBD stores 0
+
+    @BLACK
+    0;JMP // jump to BLACK if not
+
+(BLACK)
+    @i
+    D=M
+    @KBD
+    D=D-A
+    @LOOP
+    D;JEQ // if i points to KBD (finished going over screen) jump to LOOP
+
+    @i
+    A=M
+    M=-1 // make pixel -1 (1111111111111111)
+
+    @i
+    M=M+1
+    @BLACK
+    0;JMP
+
+(WHITE)
+    @i
+    D=M
+    @KBD
+    D=D-A
+    @LOOP
+    D;JEQ // if i points to KBD (finished going over screen) jump to LOOP
+
+    @i
+    A=M
+    M=0 // make pixel 0 (0000000000000000)
+
+    @i
+    M=M+1
+    @WHITE
+    0;JMP
