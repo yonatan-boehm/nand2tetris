@@ -23,5 +23,25 @@ CHIP ExtendAlu {
      OUT out[16], zr, ng;
      
      PARTS:
-     // Put your code here:
+     // shifted x and y
+     ShiftRight(in=x, out=rx);
+     ShiftLeft(in=x, out=lx);
+     ShiftRight(in=y, out=ry);
+     ShiftLeft(in=y, out=ly);
+
+     Mux4Way16(a=ry, b=rx, c=ly, d=lx, sel=instruction[4..5], out=shiftedOut);
+     ALU(x=x, y=y, 
+          zx=instruction[5], nx=instruction[4], zy=instruction[3], 
+          ny=instruction[2], f=instruction[1], no=instruction[0], 
+          out=aluOut, zr=aluZr, ng=aluNg);
+     And(a=instruction[8], b=instruction[7], out=isALU);
+     Mux16(a=shiftedOut, b=aluOut, sel=isALU, 
+          out=out, out[0..7]=zr1, 
+          out[8..15]=zr2, out[15]=ng);
+
+     // zr 
+     Or8Way(in=zr1, out=or1);
+     Or8Way(in=zr2, out=or2);
+     Or(a=or1, b=or2, out=or3);
+     Not(in=or3, out=zr);
 }
