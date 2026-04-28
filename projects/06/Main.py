@@ -21,6 +21,10 @@ def assemble_file(
         input_file (typing.TextIO): the file to assemble.
         output_file (typing.TextIO): writes all output to this file.
     """
+    parser = Parser(input_file)
+    while parser.has_more_commands():
+        parser.advance()
+        print(parser.current_command)
     # Your code goes here!
     # A good place to start is to initialize a new Parser object:
     # parser = Parser(input_file)
