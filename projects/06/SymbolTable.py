@@ -60,7 +60,4 @@ class SymbolTable:
             int: the address associated with the symbol.
         """
         # Your code goes here!
-        if self.contains(symbol):
-            return self.symbol_table_dict[symbol]
-        else:
-            return default    
+        return self.symbol_table_dict.get(symbol, default)    

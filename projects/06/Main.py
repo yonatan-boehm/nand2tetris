@@ -13,30 +13,50 @@ from SymbolTable import SymbolTable
 from Parser import Parser
 from Code import Code
 
-def replace_symbols(parser: Parser, symbol_table: SymbolTable):
+def first_pass(parser: Parser, symbol_table: SymbolTable) -> None:
+    """
+    Goes through the entire assembly program, only paying attention to (XXX) pseudo-commands.
+    Adds them to the symbol table with their corresponding ROM address.
+    """
+    rom_address = 0
     while parser.has_more_commands():
         parser.advance()
-        if parser.command_type() == COMMAND_TYPE.L_COMMAND:
+        cmd_type = parser.command_type()
+        if cmd_type == COMMAND_TYPE.L_COMMAND:
+            symbol = parser.symbol()
+            symbol_table.add_entry(symbol, rom_address)
+        elif cmd_type in (COMMAND_TYPE.A_COMMAND, COMMAND_TYPE.C_COMMAND):
+            rom_address += 1
 
-            symbol_table.add_entry(parser.symbol(), parser.next_cmd_idx-1)
-            parser.delete_current_line()
-
+def second_pass(parser: Parser, symbol_table: SymbolTable, output_file: typing.TextIO) -> None:
+    """
+    Translates commands to binary and handles variables.
+    """
+    code = Code()
+    parser.reset()
+    while parser.has_more_commands():
+        parser.advance()
+        cmd_type = parser.command_type()
+        
+        if cmd_type == COMMAND_TYPE.A_COMMAND:
+            symbol = parser.symbol()
+            if symbol.isdigit():
+                address = int(symbol)
+            else:
+                if not symbol_table.contains(symbol):
+                    symbol_table.add_entry(symbol, symbol_table.new_symbol_address)
+                    symbol_table.increment_new_symbol_address()
+                address = symbol_table.get_address(symbol)
             
-    parser.reset()
-    parser.advance()
-    while parser.has_more_commands():
-        if parser.command_type() == COMMAND_TYPE.C_COMMAND:
-            parser.advance()
-            continue
-        symbol = parser.symbol()
-        try:
-            int(symbol)
-        except ValueError:
-            if not symbol_table.contains(symbol):
-                symbol_table.add_entry(symbol, symbol_table.new_symbol_address)
-                symbol_table.increment_new_symbol_address()
-        parser.advance()
-    parser.reset()
+            binary_string = bin(address)[2:].zfill(16)
+            output_file.write(binary_string + '\n')
+            
+        elif cmd_type == COMMAND_TYPE.C_COMMAND:
+            comp = code.comp(parser.comp())
+            dest = code.dest(parser.dest())
+            jump = code.jump(parser.jump())
+            binary_string = "111" + comp + dest + jump
+            output_file.write(binary_string + '\n')
 
 def assemble_file(
         input_file: typing.TextIO, output_file: typing.TextIO) -> None:
@@ -48,21 +68,9 @@ def assemble_file(
     """
     parser = Parser(input_file)
     symbol_table = SymbolTable()
-    replace_symbols(parser, symbol_table)
-    code = Code()
-    while parser.has_more_commands():
-        parser.advance()
-        if parser.command_type() == COMMAND_TYPE.A_COMMAND:
-            symbol = symbol_table.get_address(parser.symbol(),parser.symbol())
-            binary_command = bin(int(symbol))[2:]
-            binary_string = "0" * (16 - len(binary_command)) + binary_command
-            output_file.write(binary_string+'\n')
-        elif parser.command_type() == COMMAND_TYPE.C_COMMAND:
-            comp = code.comp(parser.comp())
-            dest = code.dest(parser.dest())
-            jump = code.jump(parser.jump())
-            binary_string = "111"+comp+dest+jump
-            output_file.write(binary_string+'\n')
+    
+    first_pass(parser, symbol_table)
+    second_pass(parser, symbol_table, output_file)
 
 
 if "__main__" == __name__:

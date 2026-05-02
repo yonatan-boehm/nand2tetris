@@ -9,8 +9,8 @@ from enum import Enum
 import typing
 
 class COMMAND_TYPE(Enum):
-    A_COMMAND = "A_COMMAND",
-    C_COMMAND = "C_COMMAND",
+    A_COMMAND = "A_COMMAND"
+    C_COMMAND = "C_COMMAND"
     L_COMMAND = "L_COMMAND"
 
 class Parser:
@@ -26,7 +26,7 @@ class Parser:
         Args:
             input_file (typing.TextIO): input file.
         """
-        self.input_lines = self.first_pass(input_file.read().splitlines())
+        self.input_lines = self._filter_lines(input_file.read().splitlines())
         self.current_command = None
         self.next_cmd_idx = 0
 
@@ -43,12 +43,6 @@ class Parser:
         Should be called only if has_more_commands() is true.
         """
         if self.has_more_commands():
-            '''cmd = self.input_lines[self.next_cmd_idx].replace(" ","")
-            comment_index = cmd.find('//')
-            if comment_index == -1:
-                self.current_command = cmd
-            else:
-                self.current_command = cmd[:comment_index]'''
             self.current_command = self.input_lines[self.next_cmd_idx]
             self.next_cmd_idx += 1
         return
@@ -126,7 +120,7 @@ class Parser:
             return "null"
         return self.current_command[jump_index + 1:]
     
-    def first_pass(self, input_lines: list[str]):
+    def _filter_lines(self, input_lines: list[str]) -> list[str]:
         filtered_lines = []
         for line in input_lines:
             stripped_line = line.replace(" ", "")
@@ -137,10 +131,6 @@ class Parser:
             filtered_lines.append(stripped_line)
         return filtered_lines
     
-    def reset(self):
+    def reset(self) -> None:
         self.current_command = None
-        self.next_cmd_idx = 0  
-
-    def delete_current_line(self):
-        self.input_lines.pop(self.next_cmd_idx-1)
-        self.next_cmd_idx -= 1
+        self.next_cmd_idx = 0
