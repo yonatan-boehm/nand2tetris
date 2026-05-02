@@ -43,12 +43,13 @@ class Parser:
         Should be called only if has_more_commands() is true.
         """
         if self.has_more_commands():
-            cmd = self.input_lines[self.next_cmd_idx].replace(" ","")
+            '''cmd = self.input_lines[self.next_cmd_idx].replace(" ","")
             comment_index = cmd.find('//')
             if comment_index == -1:
                 self.current_command = cmd
             else:
-                self.current_command = cmd[:comment_index]
+                self.current_command = cmd[:comment_index]'''
+            self.current_command = self.input_lines[self.next_cmd_idx]
             self.next_cmd_idx += 1
         return
 
@@ -87,7 +88,7 @@ class Parser:
         """
         Returns:
             str: the dest mnemonic in the current C-command. Should be called 
-            only when commandType() is "C_COMMAND".
+            only when command_type() is "C_COMMAND".
         """
         if self.command_type() != COMMAND_TYPE.C_COMMAND:
             raise Exception('invalid command type')
@@ -101,7 +102,7 @@ class Parser:
         """
         Returns:
             str: the comp mnemonic in the current C-command. Should be called 
-            only when commandType() is "C_COMMAND".
+            only when command_type() is "C_COMMAND".
         """
         if self.command_type() != COMMAND_TYPE.C_COMMAND:
             raise Exception('invalid command type')
@@ -116,7 +117,7 @@ class Parser:
         """
         Returns:
             str: the jump mnemonic in the current C-command. Should be called 
-            only when commandType() is "C_COMMAND".
+            only when command_type() is "C_COMMAND".
         """
         if self.command_type() != COMMAND_TYPE.C_COMMAND:
             raise Exception('invalid command type')
@@ -131,6 +132,15 @@ class Parser:
             stripped_line = line.replace(" ", "")
             if stripped_line.startswith("//") or stripped_line == "":
                 continue
+            if "//" in stripped_line:
+                stripped_line = stripped_line.split("//")[0]
             filtered_lines.append(stripped_line)
         return filtered_lines
-        
+    
+    def reset(self):
+        self.current_command = None
+        self.next_cmd_idx = 0  
+
+    def delete_current_line(self):
+        self.input_lines.pop(self.next_cmd_idx-1)
+        self.next_cmd_idx -= 1

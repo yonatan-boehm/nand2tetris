@@ -19,7 +19,11 @@ class SymbolTable:
         book.
         """
         # Your code goes here!
-        pass
+        self.symbol_table_dict = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4, "SCREEN": 16384, "KBD": 24576}
+        for i in range(16):
+            current_register = f"R{i}"
+            self.symbol_table_dict[current_register] = i
+        self.new_symbol_address = 16
 
     def add_entry(self, symbol: str, address: int) -> None:
         """Adds the pair (symbol, address) to the table.
@@ -29,7 +33,10 @@ class SymbolTable:
             address (int): the address corresponding to the symbol.
         """
         # Your code goes here!
-        pass
+        self.symbol_table_dict[symbol] = address
+
+    def increment_new_symbol_address(self):
+        self.new_symbol_address += 1
 
     def contains(self, symbol: str) -> bool:
         """Does the symbol table contain the given symbol?
@@ -41,9 +48,9 @@ class SymbolTable:
             bool: True if the symbol is contained, False otherwise.
         """
         # Your code goes here!
-        pass
+        return symbol in self.symbol_table_dict
 
-    def get_address(self, symbol: str) -> int:
+    def get_address(self, symbol: str, default=None) -> int:
         """Returns the address associated with the symbol.
 
         Args:
@@ -53,4 +60,7 @@ class SymbolTable:
             int: the address associated with the symbol.
         """
         # Your code goes here!
-        pass
+        if self.contains(symbol):
+            return self.symbol_table_dict[symbol]
+        else:
+            return default    
