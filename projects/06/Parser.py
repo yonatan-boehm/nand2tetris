@@ -123,7 +123,7 @@ class Parser:
     def _filter_lines(self, input_lines: list[str]) -> list[str]:
         filtered_lines = []
         for line in input_lines:
-            stripped_line = line.replace(" ", "")
+            stripped_line = line.replace(" ", "").replace("\t", "").replace("\r", "")
             if stripped_line.startswith("//") or stripped_line == "":
                 continue
             if "//" in stripped_line:
