@@ -52,10 +52,13 @@ def second_pass(parser: Parser, symbol_table: SymbolTable, output_file: typing.T
             output_file.write(binary_string + '\n')
             
         elif cmd_type == COMMAND_TYPE.C_COMMAND:
-            comp = code.comp(parser.comp())
+            comp_mnemonic = parser.comp()
+            is_shift = ">>" in comp_mnemonic or "<<" in comp_mnemonic
+            comp = code.comp(comp_mnemonic)
             dest = code.dest(parser.dest())
             jump = code.jump(parser.jump())
-            binary_string = "111" + comp + dest + jump
+            prefix = "101" if is_shift else "111"
+            binary_string = prefix + comp + dest + jump
             output_file.write(binary_string + '\n')
 
 def assemble_file(
