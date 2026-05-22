@@ -1,9 +1,9 @@
 # Script by Segal and Kali
 # Version 2.0
 
-"""                           ----- USAGE -----
- Please make sure that you have both 'bitstring' and 'pyperclip' libraries.
- If you don't, use 'pip install xxx' to install them.
+"""----- USAGE -----
+Please make sure that you have both 'bitstring' and 'pyperclip' libraries.
+If you don't, use 'pip install xxx' to install them.
 """
 
 
@@ -20,12 +20,12 @@ WORD_SIZE = 16
 ROW_OFFSET = 32
 BAD_VALUE = -32768
 GOOD_VALUE = 16384
-B1       = '    function void drawNAME(int offset) {'
-B2       = '        var int scnAddres;'
-B3       = '        let scnAddres = 16384 + offset;'
-LINE_PRE = '        do Memory.poke(scnAddres + '
-A1       = '        return;'
-A2       = '    }'
+B1 = "    function void drawNAME(int offset) {"
+B2 = "        var int scnAddres;"
+B3 = "        let scnAddres = 16384 + offset;"
+LINE_PRE = "        do Memory.poke(scnAddres + "
+A1 = "        return;"
+A2 = "    }"
 
 
 def average(cell):
@@ -43,7 +43,7 @@ def img_to_bool(path):
     img = Image.open(path)
     width, _ = img.size
     if not width % WORD_SIZE == 0:
-        raise Exception('Given image width does not divide by 16!')
+        raise Exception("Given image width does not divide by 16!")
     col_num = int(width / WORD_SIZE)
 
     # Convert to binary
@@ -52,7 +52,7 @@ def img_to_bool(path):
         bool_row = []
         for cell in row:
             avg = average(cell)
-            value = '1' if avg < MID_COL else '0'
+            value = "1" if avg < MID_COL else "0"
             bool_row.append(value)
         bw.append(bool_row)
     return bw, col_num
@@ -60,7 +60,7 @@ def img_to_bool(path):
 
 def word_to_int(word):
     word = reversed(word)
-    word = ''.join(word)
+    word = "".join(word)
     as_int = Bits(bin=word).int
     if as_int == BAD_VALUE:
         as_int = GOOD_VALUE
@@ -68,7 +68,7 @@ def word_to_int(word):
 
 
 def as_line(offset, value):
-    return LINE_PRE + str(offset) + ', ' + str(value) + ');'
+    return LINE_PRE + str(offset) + ", " + str(value) + ");"
 
 
 def bool_to_jack(bw, col_num, name):
@@ -83,14 +83,16 @@ def bool_to_jack(bw, col_num, name):
             line = as_line(offset, value)
             result.append(line)
     result += [A1, A2]
-    result = '\n'.join(result)
+    result = "\n".join(result)
     return result
+
 
 def getName(path):
     base = os.path.basename(path)
     name = os.path.splitext(base)[0]
     name = name.capitalize()
     return name
+
 
 def main(path):
     print("Converting image to binary values...")
@@ -100,6 +102,7 @@ def main(path):
     result = bool_to_jack(bw, col_num, name)
     pyperclip.copy(result)
     print("Success! Result copied to clipboard.")
+
 
 if __name__ == "__main__":
     print("\n  --- Image to Jack converter --- \n")

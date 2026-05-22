@@ -5,6 +5,7 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 import typing
 
 
@@ -20,15 +21,15 @@ class SymbolTable:
         pass
 
     def start_subroutine(self) -> None:
-        """Starts a new subroutine scope (i.e., resets the subroutine's 
+        """Starts a new subroutine scope (i.e., resets the subroutine's
         symbol table).
         """
         # Your code goes here!
         pass
 
     def define(self, name: str, type: str, kind: str) -> None:
-        """Defines a new identifier of a given name, type and kind and assigns 
-        it a running index. "STATIC" and "FIELD" identifiers have a class scope, 
+        """Defines a new identifier of a given name, type and kind and assigns
+        it a running index. "STATIC" and "FIELD" identifiers have a class scope,
         while "ARG" and "VAR" identifiers have a subroutine scope.
 
         Args:
@@ -46,7 +47,7 @@ class SymbolTable:
             kind (str): can be "STATIC", "FIELD", "ARG", "VAR".
 
         Returns:
-            int: the number of variables of the given kind already defined in 
+            int: the number of variables of the given kind already defined in
             the current scope.
         """
         # Your code goes here!

@@ -5,6 +5,7 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 import typing
 
 
@@ -45,7 +46,7 @@ class CompilationEngine:
         pass
 
     def compile_parameter_list(self) -> None:
-        """Compiles a (possibly empty) parameter list, not including the 
+        """Compiles a (possibly empty) parameter list, not including the
         enclosing "()".
         """
         # Your code goes here!
@@ -57,7 +58,7 @@ class CompilationEngine:
         pass
 
     def compile_statements(self) -> None:
-        """Compiles a sequence of statements, not including the enclosing 
+        """Compiles a sequence of statements, not including the enclosing
         "{}".
         """
         # Your code goes here!
@@ -94,7 +95,7 @@ class CompilationEngine:
         pass
 
     def compile_term(self) -> None:
-        """Compiles a term. 
+        """Compiles a term.
         This routine is faced with a slight difficulty when
         trying to decide between some of the alternative parsing rules.
         Specifically, if the current token is an identifier, the routing must

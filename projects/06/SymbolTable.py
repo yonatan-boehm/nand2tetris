@@ -9,7 +9,7 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
 class SymbolTable:
     """
-    A symbol table that keeps a correspondence between symbolic labels and 
+    A symbol table that keeps a correspondence between symbolic labels and
     numeric addresses.
     """
 
@@ -19,7 +19,15 @@ class SymbolTable:
         book.
         """
         # Your code goes here!
-        self.symbol_table_dict = {"SP": 0, "LCL": 1, "ARG": 2, "THIS": 3, "THAT": 4, "SCREEN": 16384, "KBD": 24576}
+        self.symbol_table_dict = {
+            "SP": 0,
+            "LCL": 1,
+            "ARG": 2,
+            "THIS": 3,
+            "THAT": 4,
+            "SCREEN": 16384,
+            "KBD": 24576,
+        }
         for i in range(16):
             current_register = f"R{i}"
             self.symbol_table_dict[current_register] = i
@@ -60,4 +68,4 @@ class SymbolTable:
             int: the address associated with the symbol.
         """
         # Your code goes here!
-        return self.symbol_table_dict.get(symbol, default)    
+        return self.symbol_table_dict.get(symbol, default)

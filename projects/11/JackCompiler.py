@@ -5,6 +5,7 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 import os
 import sys
 import typing
@@ -14,8 +15,7 @@ from SymbolTable import SymbolTable
 from VMWriter import VMWriter
 
 
-def compile_file(
-        input_file: typing.TextIO, output_file: typing.TextIO) -> None:
+def compile_file(input_file: typing.TextIO, output_file: typing.TextIO) -> None:
     """Compiles a single file.
 
     Args:
@@ -40,7 +40,8 @@ if "__main__" == __name__:
     if os.path.isdir(argument_path):
         files_to_assemble = [
             os.path.join(argument_path, filename)
-            for filename in os.listdir(argument_path)]
+            for filename in os.listdir(argument_path)
+        ]
     else:
         files_to_assemble = [argument_path]
     for input_path in files_to_assemble:
@@ -48,6 +49,5 @@ if "__main__" == __name__:
         if extension.lower() != ".jack":
             continue
         output_path = filename + ".vm"
-        with open(input_path, 'r') as input_file, \
-                open(output_path, 'w') as output_file:
+        with open(input_path, "r") as input_file, open(output_path, "w") as output_file:
             compile_file(input_file, output_file)

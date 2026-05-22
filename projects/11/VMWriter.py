@@ -5,6 +5,7 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 import typing
 
 
@@ -24,7 +25,7 @@ class VMWriter:
         """Writes a VM push command.
 
         Args:
-            segment (str): the segment to push to, can be "CONST", "ARG", 
+            segment (str): the segment to push to, can be "CONST", "ARG",
             "LOCAL", "STATIC", "THIS", "THAT", "POINTER", "TEMP"
             index (int): the index to push to.
         """
@@ -35,7 +36,7 @@ class VMWriter:
         """Writes a VM pop command.
 
         Args:
-            segment (str): the segment to pop from, can be "CONST", "ARG", 
+            segment (str): the segment to pop from, can be "CONST", "ARG",
             "LOCAL", "STATIC", "THIS", "THAT", "POINTER", "TEMP".
             index (int): the index to pop from.
         """
@@ -46,7 +47,7 @@ class VMWriter:
         """Writes a VM arithmetic command.
 
         Args:
-            command (str): the command to write, can be "ADD", "SUB", "NEG", 
+            command (str): the command to write, can be "ADD", "SUB", "NEG",
             "EQ", "GT", "LT", "AND", "OR", "NOT", "SHIFTLEFT", "SHIFTRIGHT".
         """
         # Your code goes here!

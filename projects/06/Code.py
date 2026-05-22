@@ -9,6 +9,7 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
 class Code:
     """Translates Hack assembly language mnemonics into binary codes."""
+
     dest_mnemonics = {
         "NULL": "000",
         "M": "001",
@@ -17,7 +18,7 @@ class Code:
         "A": "100",
         "AM": "101",
         "AD": "110",
-        "AMD": "111"
+        "AMD": "111",
     }
 
     comp_mnemonics = {
@@ -54,7 +55,7 @@ class Code:
         "M>>": "1000000",
         "A<<": "0100000",
         "D<<": "0110000",
-        "M<<": "1100000"
+        "M<<": "1100000",
     }
 
     jump_mnemonics = {
@@ -66,9 +67,9 @@ class Code:
         "JLT": "100",
         "JNE": "101",
         "JLE": "110",
-        "JMP": "111"
+        "JMP": "111",
     }
-    
+
     @staticmethod
     def dest(mnemonic: str) -> str:
         """

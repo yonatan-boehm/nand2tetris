@@ -5,6 +5,7 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 import os
 import sys
 import typing
@@ -13,14 +14,14 @@ from CodeWriter import CodeWriter
 
 
 def translate_file(
-        input_file: typing.TextIO, output_file: typing.TextIO,
-        bootstrap: bool) -> None:
+    input_file: typing.TextIO, output_file: typing.TextIO, bootstrap: bool
+) -> None:
     """Translates a single file.
 
     Args:
         input_file (typing.TextIO): the file to translate.
         output_file (typing.TextIO): writes all output to this file.
-        bootstrap (bool): if this is True, the current file is the 
+        bootstrap (bool): if this is True, the current file is the
             first file we are translating.
     """
     # Your code goes here!
@@ -39,19 +40,19 @@ if "__main__" == __name__:
     if os.path.isdir(argument_path):
         files_to_translate = [
             os.path.join(argument_path, filename)
-            for filename in os.listdir(argument_path)]
-        output_path = os.path.join(argument_path, os.path.basename(
-            argument_path))
+            for filename in os.listdir(argument_path)
+        ]
+        output_path = os.path.join(argument_path, os.path.basename(argument_path))
     else:
         files_to_translate = [argument_path]
         output_path, extension = os.path.splitext(argument_path)
     output_path += ".asm"
     bootstrap = True
-    with open(output_path, 'w') as output_file:
+    with open(output_path, "w") as output_file:
         for input_path in files_to_translate:
             filename, extension = os.path.splitext(input_path)
             if extension.lower() != ".vm":
                 continue
-            with open(input_path, 'r') as input_file:
+            with open(input_path, "r") as input_file:
                 translate_file(input_file, output_file, bootstrap)
             bootstrap = False

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Test runner for Project 06 (Hack Assembler).
-It compiles all .asm files in the project 06 directories using both our custom 
-assembler and the official built-in course assembler, and verifies they are 
+It compiles all .asm files in the project 06 directories using both our custom
+assembler and the official built-in course assembler, and verifies they are
 identical line-for-line.
 """
 import os
@@ -17,6 +17,7 @@ YELLOW = "\033[93m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
+
 def run_cmd(args: list, cwd: str = None) -> tuple:
     """Runs a shell command and returns (stdout, stderr, exit_code)."""
     try:
@@ -25,6 +26,7 @@ def run_cmd(args: list, cwd: str = None) -> tuple:
     except Exception as e:
         return "", str(e), -1
 
+
 def main():
     print(f"{BOLD}{CYAN}=================================================={RESET}")
     print(f"{BOLD}{CYAN}      NAND2TETRIS PROJECT 06 ASSEMBLER TESTER     {RESET}")
@@ -32,7 +34,7 @@ def main():
 
     project_dir = os.path.dirname(os.path.abspath(__file__))
     tools_dir = os.path.abspath(os.path.join(project_dir, "..", "..", "tools"))
-    
+
     # Path to HackAssembler Java classpath
     classpath = (
         f"{tools_dir}/bin/classes:"
@@ -45,7 +47,7 @@ def main():
 
     # Subdirectories containing .asm files
     subdirs = ["add", "max", "pong", "rect", "shift"]
-    
+
     test_files = []
     for subdir in subdirs:
         subdir_path = os.path.join(project_dir, subdir)
@@ -56,7 +58,7 @@ def main():
                 test_files.append(os.path.join(subdir, file))
 
     test_files.sort()
-    
+
     if not test_files:
         print(f"{RED}No .asm files found to test!{RESET}")
         sys.exit(1)
@@ -79,14 +81,14 @@ def main():
         # We invoke python3 Main.py <asm_path>
         our_assembler_args = ["python3", "Main.py", asm_path]
         _, err_mine, code_mine = run_cmd(our_assembler_args, cwd=project_dir)
-        
+
         if code_mine != 0 or not os.path.exists(hack_ref_path):
             print(f"{test_case_name:<30} | {RED}FAILED{RESET} (Custom Assembler Error)")
             if err_mine:
                 print(f"  Error: {err_mine.strip()}")
             failed_count += 1
             continue
-        
+
         # Rename our output to .hack.mine
         if os.path.exists(hack_mine_path):
             os.remove(hack_mine_path)
@@ -95,14 +97,17 @@ def main():
         # 2. Run the official assembler on the asm file
         official_assembler_args = [
             "java",
-            "-classpath", classpath,
+            "-classpath",
+            classpath,
             "HackAssemblerMain",
-            asm_path
+            asm_path,
         ]
         _, err_ref, code_ref = run_cmd(official_assembler_args, cwd=project_dir)
 
         if code_ref != 0 or not os.path.exists(hack_ref_path):
-            print(f"{test_case_name:<30} | {RED}FAILED{RESET} (Official Assembler Error)")
+            print(
+                f"{test_case_name:<30} | {RED}FAILED{RESET} (Official Assembler Error)"
+            )
             if err_ref:
                 print(f"  Error: {err_ref.strip()}")
             # Clean up
@@ -133,7 +138,9 @@ def main():
                         mismatch_found = True
                         break
                 if not mismatch_found:
-                    print(f"  Size Mismatch: Custom={len(lines_mine)} lines, Official={len(lines_ref)} lines.")
+                    print(
+                        f"  Size Mismatch: Custom={len(lines_mine)} lines, Official={len(lines_ref)} lines."
+                    )
                 failed_count += 1
 
         except Exception as e:
@@ -151,6 +158,7 @@ def main():
     print(f"  Passed: {GREEN}{passed_count}{RESET}")
     print(f"  Failed: {RED if failed_count > 0 else GREEN}{failed_count}{RESET}")
     print(f"{BOLD}{CYAN}=================================================={RESET}")
+
 
 if __name__ == "__main__":
     main()

@@ -5,6 +5,7 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 from Parser import COMMAND_TYPE
 import os
 import sys
@@ -12,6 +13,7 @@ import typing
 from SymbolTable import SymbolTable
 from Parser import Parser
 from Code import Code
+
 
 def first_pass(parser: Parser, symbol_table: SymbolTable) -> None:
     """
@@ -28,7 +30,10 @@ def first_pass(parser: Parser, symbol_table: SymbolTable) -> None:
         elif cmd_type in (COMMAND_TYPE.A_COMMAND, COMMAND_TYPE.C_COMMAND):
             rom_address += 1
 
-def second_pass(parser: Parser, symbol_table: SymbolTable, output_file: typing.TextIO) -> None:
+
+def second_pass(
+    parser: Parser, symbol_table: SymbolTable, output_file: typing.TextIO
+) -> None:
     """
     Translates commands to binary and handles variables.
     """
@@ -37,7 +42,7 @@ def second_pass(parser: Parser, symbol_table: SymbolTable, output_file: typing.T
     while parser.has_more_commands():
         parser.advance()
         cmd_type = parser.command_type()
-        
+
         if cmd_type == COMMAND_TYPE.A_COMMAND:
             symbol = parser.symbol()
             if symbol.isdigit():
@@ -47,10 +52,10 @@ def second_pass(parser: Parser, symbol_table: SymbolTable, output_file: typing.T
                     symbol_table.add_entry(symbol, symbol_table.new_symbol_address)
                     symbol_table.increment_new_symbol_address()
                 address = symbol_table.get_address(symbol)
-            
+
             binary_string = bin(address)[2:].zfill(16)
-            output_file.write(binary_string + '\n')
-            
+            output_file.write(binary_string + "\n")
+
         elif cmd_type == COMMAND_TYPE.C_COMMAND:
             comp_mnemonic = parser.comp()
             is_shift = ">>" in comp_mnemonic or "<<" in comp_mnemonic
@@ -59,10 +64,10 @@ def second_pass(parser: Parser, symbol_table: SymbolTable, output_file: typing.T
             jump = code.jump(parser.jump())
             prefix = "101" if is_shift else "111"
             binary_string = prefix + comp + dest + jump
-            output_file.write(binary_string + '\n')
+            output_file.write(binary_string + "\n")
 
-def assemble_file(
-        input_file: typing.TextIO, output_file: typing.TextIO) -> None:
+
+def assemble_file(input_file: typing.TextIO, output_file: typing.TextIO) -> None:
     """Assembles a single file.
 
     Args:
@@ -71,7 +76,7 @@ def assemble_file(
     """
     parser = Parser(input_file)
     symbol_table = SymbolTable()
-    
+
     first_pass(parser, symbol_table)
     second_pass(parser, symbol_table, output_file)
 
@@ -88,7 +93,8 @@ if "__main__" == __name__:
     if os.path.isdir(argument_path):
         files_to_assemble = [
             os.path.join(argument_path, filename)
-            for filename in os.listdir(argument_path)]
+            for filename in os.listdir(argument_path)
+        ]
     else:
         files_to_assemble = [argument_path]
     for input_path in files_to_assemble:
@@ -96,6 +102,5 @@ if "__main__" == __name__:
         if extension.lower() != ".asm":
             continue
         output_path = filename + ".hack"
-        with open(input_path, 'r') as input_file, \
-                open(output_path, 'w') as output_file:
+        with open(input_path, "r") as input_file, open(output_path, "w") as output_file:
             assemble_file(input_file, output_file)

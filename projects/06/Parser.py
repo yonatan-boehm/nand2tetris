@@ -5,13 +5,16 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 from enum import Enum
 import typing
+
 
 class COMMAND_TYPE(Enum):
     A_COMMAND = "A_COMMAND"
     C_COMMAND = "C_COMMAND"
     L_COMMAND = "L_COMMAND"
+
 
 class Parser:
     """Encapsulates access to the input code. Reads an assembly program
@@ -56,19 +59,17 @@ class Parser:
             "L_COMMAND" (actually, pseudo-command) for (Xxx) where Xxx is a symbol
         """
         cmd = self.current_command
-        if cmd.startswith('(') and cmd.endswith(')'):
+        if cmd.startswith("(") and cmd.endswith(")"):
             return COMMAND_TYPE.L_COMMAND
-        if cmd.startswith('@'):
+        if cmd.startswith("@"):
             return COMMAND_TYPE.A_COMMAND
         return COMMAND_TYPE.C_COMMAND
-
-        
 
     def symbol(self) -> str:
         """
         Returns:
             str: the symbol or decimal Xxx of the current command @Xxx or
-            (Xxx). Should be called only when command_type() is "A_COMMAND" or 
+            (Xxx). Should be called only when command_type() is "A_COMMAND" or
             "L_COMMAND".
         """
         if self.command_type() == COMMAND_TYPE.A_COMMAND:
@@ -76,50 +77,49 @@ class Parser:
         elif self.command_type() == COMMAND_TYPE.L_COMMAND:
             return self.current_command[1:-1]
         else:
-            raise Exception('invalid command type')
+            raise Exception("invalid command type")
 
     def dest(self) -> str:
         """
         Returns:
-            str: the dest mnemonic in the current C-command. Should be called 
+            str: the dest mnemonic in the current C-command. Should be called
             only when command_type() is "C_COMMAND".
         """
         if self.command_type() != COMMAND_TYPE.C_COMMAND:
-            raise Exception('invalid command type')
+            raise Exception("invalid command type")
         dest_part = self.current_command
-        if '=' in dest_part:
-            return dest_part.split('=')[0]
+        if "=" in dest_part:
+            return dest_part.split("=")[0]
         return ""
-        
 
     def comp(self) -> str:
         """
         Returns:
-            str: the comp mnemonic in the current C-command. Should be called 
+            str: the comp mnemonic in the current C-command. Should be called
             only when command_type() is "C_COMMAND".
         """
         if self.command_type() != COMMAND_TYPE.C_COMMAND:
-            raise Exception('invalid command type')
+            raise Exception("invalid command type")
         comp_part = self.current_command
         if "=" in comp_part:
-            comp_part = comp_part.split('=')[1]
+            comp_part = comp_part.split("=")[1]
         if ";" in comp_part:
-            comp_part = comp_part.split(';')[0]
+            comp_part = comp_part.split(";")[0]
         return comp_part
 
     def jump(self) -> str:
         """
         Returns:
-            str: the jump mnemonic in the current C-command. Should be called 
+            str: the jump mnemonic in the current C-command. Should be called
             only when command_type() is "C_COMMAND".
         """
         if self.command_type() != COMMAND_TYPE.C_COMMAND:
-            raise Exception('invalid command type')
-        jump_index = self.current_command.find(';')
+            raise Exception("invalid command type")
+        jump_index = self.current_command.find(";")
         if jump_index == -1:
             return "null"
-        return self.current_command[jump_index + 1:]
-    
+        return self.current_command[jump_index + 1 :]
+
     def _filter_lines(self, input_lines: list[str]) -> list[str]:
         filtered_lines = []
         for line in input_lines:
@@ -130,7 +130,7 @@ class Parser:
                 stripped_line = stripped_line.split("//")[0]
             filtered_lines.append(stripped_line)
         return filtered_lines
-    
+
     def reset(self) -> None:
         self.current_command = None
         self.next_cmd_idx = 0
