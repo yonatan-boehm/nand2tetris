@@ -5,7 +5,11 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
+import os
 import typing
+
+from Parser import COMMAND_TYPE
 
 
 class CodeWriter:
@@ -20,10 +24,20 @@ class CodeWriter:
         # Your code goes here!
         # Note that you can write to output_stream like so:
         # output_stream.write("Hello world! \n")
-        pass
+        self.output_file = output_stream
+        self.conditional_counter = 0
+        self.filename = os.path.basename(self.output_file.name)
+        self.segment_dict = {
+            "this": "THIS",
+            "that": "THAT",
+            "local": "LCL",
+            "argument": "ARG",
+            "temp": "5",
+        }
+        return
 
     def set_file_name(self, filename: str) -> None:
-        """Informs the code writer that the translation of a new VM file is 
+        """Informs the code writer that the translation of a new VM file is
         started.
 
         Args:
@@ -40,10 +54,11 @@ class CodeWriter:
         # the function "translate_file" in Main.py using python's os library,
         # For example, using code similar to:
         # input_filename, input_extension = os.path.splitext(os.path.basename(input_file.name))
-        pass
+        self.filename = filename
+        return
 
     def write_arithmetic(self, command: str) -> None:
-        """Writes assembly code that is the translation of the given 
+        """Writes assembly code that is the translation of the given
         arithmetic command. For the commands eq, lt, gt, you should correctly
         compare between all numbers our computer supports, and we define the
         value "true" to be -1, and "false" to be 0.
@@ -52,26 +67,138 @@ class CodeWriter:
             command (str): an arithmetic command.
         """
         # Your code goes here!
-        pass
+        self.output_file.write(f"//{command}" + "\n")
+        if command == "add" or command == "sub":
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("A=M-1" + "\n")
+            self.output_file.write("D=M" + "\n")
+            self.output_file.write("A=A-1" + "\n")
+            op = "M=D+M" if command == "add" else "M=M-D"
+            self.output_file.write(op + "\n")
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("M=M-1" + "\n")
+        elif command == "neg":
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("A=M-1" + "\n")
+            self.output_file.write("M=-M" + "\n")
+        elif command in ["and","or"]:
+            cond = "&" if command == "and" else "|" 
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("A=M-1" + "\n")
+            self.output_file.write("D=M" + "\n")
+            self.output_file.write("A=A-1" + "\n")
+            self.output_file.write(f"M=D{cond}M" + "\n")
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("M=M-1" + "\n")
+        elif command in ["not","shiftright","shiftleft"]:
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("A=M-1" + "\n")
+            if command == "not":
+                self.output_file.write("M=!M" + "\n")
+            elif command == "shiftleft":
+                self.output_file.write("M=M<<" + "\n")
+            else:
+                self.output_file.write("M=M>>" + "\n")
+        else: # edge case when x,y have different signs, cant load a negative to D register
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("A=M-1" + "\n")
+            self.output_file.write("D=M" + "\n")
+            self.output_file.write("A=A-1" + "\n")
+            self.output_file.write("D=M-D" + "\n")
+            self.output_file.write("M=-1" + "\n")
+            self.output_file.write(f"@CONDITIONAL.{self.conditional_counter}" + "\n")
+            if command == "gt":
+                self.output_file.write("D;JGT" + "\n")
+            elif command == "lt":
+                self.output_file.write("D;JLT" + "\n")
+            else:
+                self.output_file.write("D;JEQ" + "\n")
+            self.output_file.write("@SP\n")
+            self.output_file.write("A=M-1\n")
+            self.output_file.write("A=A-1\n")
+            self.output_file.write("M=0\n")
+
+            self.output_file.write(f"(CONDITIONAL.{self.conditional_counter})" + "\n")
+            self.output_file.write("@SP" + "\n")
+            self.output_file.write("M=M-1" + "\n")
+            self.conditional_counter += 1
+        return
 
     def write_push_pop(self, command: str, segment: str, index: int) -> None:
-        """Writes assembly code that is the translation of the given 
-        command, where command is either C_PUSH or C_POP.
+        if command == COMMAND_TYPE.C_PUSH:
+            self.output_file.write(f"// push {segment} {index}" + "\n")
+            if segment == "constant":
+                self.output_file.write(f"@{index}" + "\n")
+                self.output_file.write("D=A" + "\n")
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("A=M" + "\n")
+                self.output_file.write("M=D" + "\n")
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("M=M+1" + "\n")
+                return
 
-        Args:
-            command (str): "C_PUSH" or "C_POP".
-            segment (str): the memory segment to operate on.
-            index (int): the index in the memory segment.
-        """
-        # Your code goes here!
-        # Note: each reference to "static i" appearing in the file Xxx.vm should
-        # be translated to the assembly symbol "Xxx.i". In the subsequent
-        # assembly process, the Hack assembler will allocate these symbolic
-        # variables to the RAM, starting at address 16.
-        pass
+            if segment in self.segment_dict:
+                self.output_file.write(f"@{self.segment_dict[segment]}\n")
+                self.output_file.write("D=M" + "\n")
+                self.output_file.write(f"@{index}" + "\n")
+                self.output_file.write(f"A=D+A" + "\n")
+                self.output_file.write("D=M" + "\n")
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("A=M" + "\n")
+                self.output_file.write("M=D" + "\n")
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("M=M+1" + "\n")
+                return
+
+            if segment in ["pointer", "static"]:
+                address = (
+                    f"{self.filename}.{index}"
+                    if segment == "static"
+                    else ("THAT" if index == 1 else "THIS")
+                )
+                self.output_file.write(f"@{address}" + "\n")
+                self.output_file.write("D=M" + "\n")
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("A=M" + "\n")
+                self.output_file.write("M=D" + "\n")
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("M=M+1" + "\n")
+                return
+
+        elif command == COMMAND_TYPE.C_POP:
+            self.output_file.write(f"// pop {segment} {index}" + "\n")
+            comp = "A" if segment == "temp" else "M"
+            if segment in self.segment_dict:
+                self.output_file.write(f"@{self.segment_dict[segment]}" + "\n")
+                self.output_file.write(f"D={comp}" + "\n")
+                self.output_file.write(f"@{index}" + "\n")
+                self.output_file.write(f"D=D+A" + "\n")
+                self.output_file.write("@R13" + "\n")
+                self.output_file.write("M=D" + "\n")
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("AM=M-1" + "\n")
+                self.output_file.write("D=M" + "\n")
+                self.output_file.write("@R13" + "\n")
+                self.output_file.write("A=M" + "\n")
+                self.output_file.write("M=D" + "\n")
+                return
+
+            if segment in ["pointer", "static"]:
+                address = (
+                    f"{self.filename}.{index}"
+                    if segment == "static"
+                    else ("THAT" if index == 1 else "THIS")
+                )
+                self.output_file.write("@SP" + "\n")
+                self.output_file.write("AM=M-1" + "\n")
+                self.output_file.write("D=M" + "\n")
+                self.output_file.write(f"@{address}" + "\n")
+                self.output_file.write("M=D" + "\n")
+                return
+        return
 
     def write_label(self, label: str) -> None:
-        """Writes assembly code that affects the label command. 
+        """Writes assembly code that affects the label command.
         Let "Xxx.foo" be a function within the file Xxx.vm. The handling of
         each "label bar" command within "Xxx.foo" generates and injects the symbol
         "Xxx.foo$bar" into the assembly code stream.
@@ -84,7 +211,7 @@ class CodeWriter:
         # This is irrelevant for project 7,
         # you will implement this in project 8!
         pass
-    
+
     def write_goto(self, label: str) -> None:
         """Writes assembly code that affects the goto command.
 
@@ -94,9 +221,9 @@ class CodeWriter:
         # This is irrelevant for project 7,
         # you will implement this in project 8!
         pass
-    
+
     def write_if(self, label: str) -> None:
-        """Writes assembly code that affects the if-goto command. 
+        """Writes assembly code that affects the if-goto command.
 
         Args:
             label (str): the label to go to.
@@ -104,13 +231,13 @@ class CodeWriter:
         # This is irrelevant for project 7,
         # you will implement this in project 8!
         pass
-    
+
     def write_function(self, function_name: str, n_vars: int) -> None:
-        """Writes assembly code that affects the function command. 
+        """Writes assembly code that affects the function command.
         The handling of each "function Xxx.foo" command within the file Xxx.vm
         generates and injects a symbol "Xxx.foo" into the assembly code stream,
         that labels the entry-point to the function's code.
-        In the subsequent assembly process, the assembler translates this 
+        In the subsequent assembly process, the assembler translates this
         symbol into the physical address where the function code starts.
 
         Args:
@@ -124,15 +251,15 @@ class CodeWriter:
         # repeat n_vars times:  // n_vars = number of local variables
         #   push constant 0     // initializes the local variables to 0
         pass
-    
+
     def write_call(self, function_name: str, n_args: int) -> None:
-        """Writes assembly code that affects the call command. 
+        """Writes assembly code that affects the call command.
         Let "Xxx.foo" be a function within the file Xxx.vm.
         The handling of each "call" command within Xxx.foo's code generates and
         injects a symbol "Xxx.foo$ret.i" into the assembly code stream, where
         "i" is a running integer (one such symbol is generated for each "call"
         command within "Xxx.foo").
-        This symbol is used to mark the return address within the caller's 
+        This symbol is used to mark the return address within the caller's
         code. In the subsequent assembly process, the assembler translates this
         symbol into the physical memory address of the command immediately
         following the "call" command.
@@ -154,7 +281,7 @@ class CodeWriter:
         # goto function_name    // transfers control to the callee
         # (return_address)      // injects the return address label into the code
         pass
-    
+
     def write_return(self) -> None:
         """Writes assembly code that affects the return command."""
         # This is irrelevant for project 7,

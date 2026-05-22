@@ -5,15 +5,15 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 import os
 import sys
 import typing
-from Parser import Parser
+from Parser import COMMAND_TYPE, Parser
 from CodeWriter import CodeWriter
 
 
-def translate_file(
-        input_file: typing.TextIO, output_file: typing.TextIO) -> None:
+def translate_file(input_file: typing.TextIO, output_file: typing.TextIO) -> None:
     """Translates a single file.
 
     Args:
@@ -24,7 +24,17 @@ def translate_file(
     # It might be good to start with something like:
     # parser = Parser(input_file)
     # code_writer = CodeWriter(output_file)
-    pass
+    parser = Parser(input_file)
+    code_writer = CodeWriter(output_file)
+    while parser.has_more_commands():
+        parser.advance()
+        command_type = parser.command_type()
+        if command_type == COMMAND_TYPE.C_ARITHMETIC:
+            code_writer.write_arithmetic(parser.arg1())
+        else:
+            code_writer.write_push_pop(command_type, parser.arg1(), parser.arg2())
+
+    return
 
 
 if "__main__" == __name__:
@@ -39,17 +49,17 @@ if "__main__" == __name__:
     if os.path.isdir(argument_path):
         files_to_translate = [
             os.path.join(argument_path, filename)
-            for filename in os.listdir(argument_path)]
-        output_path = os.path.join(argument_path, os.path.basename(
-            argument_path))
+            for filename in os.listdir(argument_path)
+        ]
+        output_path = os.path.join(argument_path, os.path.basename(argument_path))
     else:
         files_to_translate = [argument_path]
         output_path, extension = os.path.splitext(argument_path)
     output_path += ".asm"
-    with open(output_path, 'w') as output_file:
+    with open(output_path, "w") as output_file:
         for input_path in files_to_translate:
             filename, extension = os.path.splitext(input_path)
             if extension.lower() != ".vm":
                 continue
-            with open(input_path, 'r') as input_file:
+            with open(input_path, "r") as input_file:
                 translate_file(input_file, output_file)
