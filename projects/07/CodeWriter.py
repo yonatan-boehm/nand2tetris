@@ -138,8 +138,9 @@ class CodeWriter:
                 return
 
             if segment in self.segment_dict:
+                comp = "A" if segment == "temp" else "M"
                 self.output_file.write(f"@{self.segment_dict[segment]}\n")
-                self.output_file.write("D=M" + "\n")
+                self.output_file.write(f"D={comp}" + "\n")
                 self.output_file.write(f"@{index}" + "\n")
                 self.output_file.write(f"A=D+A" + "\n")
                 self.output_file.write("D=M" + "\n")
