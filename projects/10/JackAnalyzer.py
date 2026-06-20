@@ -5,7 +5,6 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
-
 import os
 import sys
 import typing
@@ -13,7 +12,8 @@ from CompilationEngine import CompilationEngine
 from JackTokenizer import JackTokenizer
 
 
-def analyze_file(input_file: typing.TextIO, output_file: typing.TextIO) -> None:
+def analyze_file(
+        input_file: typing.TextIO, output_file: typing.TextIO) -> None:
     """Analyzes a single file.
 
     Args:
@@ -22,9 +22,11 @@ def analyze_file(input_file: typing.TextIO, output_file: typing.TextIO) -> None:
     """
     # Your code goes here!
     # It might be good to start by creating a new JackTokenizer and CompilationEngine:
-    # tokenizer = JackTokenizer(input_file)
-    # engine = CompilationEngine(tokenizer, output_file)
-    pass
+    tokenizer = JackTokenizer(input_file)
+    engine = CompilationEngine(tokenizer, output_file)
+    tokenizer.advance()
+    engine.compile_class()
+    return
 
 
 if "__main__" == __name__:
@@ -39,8 +41,7 @@ if "__main__" == __name__:
     if os.path.isdir(argument_path):
         files_to_assemble = [
             os.path.join(argument_path, filename)
-            for filename in os.listdir(argument_path)
-        ]
+            for filename in os.listdir(argument_path)]
     else:
         files_to_assemble = [argument_path]
     for input_path in files_to_assemble:
@@ -48,5 +49,6 @@ if "__main__" == __name__:
         if extension.lower() != ".jack":
             continue
         output_path = filename + ".xml"
-        with open(input_path, "r") as input_file, open(output_path, "w") as output_file:
+        with open(input_path, 'r') as input_file, \
+                open(output_path, 'w') as output_file:
             analyze_file(input_file, output_file)

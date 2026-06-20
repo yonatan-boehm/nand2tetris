@@ -185,8 +185,9 @@ class JackTokenizer:
         """Skip whitespace, line comments (//), and block comments (/* */)."""
         while self.current_line is not None:
             # Skip whitespace from current position
-            while (self.next_token_index < len(self.current_line)
-                   and self.current_line[self.next_token_index] in (' ', '\t', '\r')):
+            while self.next_token_index < len(self.current_line) and self.current_line[
+                self.next_token_index
+            ] in (" ", "\t", "\r"):
                 self.next_token_index += 1
 
             # Line exhausted - move to next
@@ -194,11 +195,17 @@ class JackTokenizer:
                 self._advance_line()
 
             # Line comment - skip entire rest of line
-            elif self.current_line[self.next_token_index:self.next_token_index + 2] == "//":
+            elif (
+                self.current_line[self.next_token_index : self.next_token_index + 2]
+                == "//"
+            ):
                 self._advance_line()
 
             # Block comment - find closing */
-            elif self.current_line[self.next_token_index:self.next_token_index + 2] == "/*":
+            elif (
+                self.current_line[self.next_token_index : self.next_token_index + 2]
+                == "/*"
+            ):
                 close_idx = self.current_line.find("*/", self.next_token_index + 2)
                 while close_idx == -1:
                     self._advance_line()
@@ -235,11 +242,13 @@ class JackTokenizer:
             while (
                 token_end_index < len(self.current_line)
                 and self.current_line[token_end_index] not in SYMBOLS
-                and self.current_line[token_end_index] not in (' ', '\t')
+                and self.current_line[token_end_index] not in (" ", "\t")
             ):
                 token_end_index += 1
 
-            self.current_token = self.current_line[self.next_token_index:token_end_index]
+            self.current_token = self.current_line[
+                self.next_token_index : token_end_index
+            ]
             self.next_token_index = token_end_index
 
         if self.next_token_index >= len(self.current_line):
@@ -262,7 +271,6 @@ class JackTokenizer:
             return TokenType.STRING_CONST
         else:
             return TokenType.IDENTIFIER
-
 
     def keyword(self) -> str:
         """
@@ -317,4 +325,6 @@ class JackTokenizer:
             StringConstant: '"' A sequence of Unicode characters not including
                       double quote or newline '"'
         """
-        return self.current_token if self.token_type() == TokenType.STRING_CONST else None
+        return (
+            self.current_token if self.token_type() == TokenType.STRING_CONST else None
+        )

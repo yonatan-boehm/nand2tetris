@@ -81,8 +81,8 @@ class CodeWriter:
             self.output_file.write("@SP" + "\n")
             self.output_file.write("A=M-1" + "\n")
             self.output_file.write("M=-M" + "\n")
-        elif command in ["and","or"]:
-            cond = "&" if command == "and" else "|" 
+        elif command in ["and", "or"]:
+            cond = "&" if command == "and" else "|"
             self.output_file.write("@SP" + "\n")
             self.output_file.write("A=M-1" + "\n")
             self.output_file.write("D=M" + "\n")
@@ -90,7 +90,7 @@ class CodeWriter:
             self.output_file.write(f"M=D{cond}M" + "\n")
             self.output_file.write("@SP" + "\n")
             self.output_file.write("M=M-1" + "\n")
-        elif command in ["not","shiftright","shiftleft"]:
+        elif command in ["not", "shiftright", "shiftleft"]:
             self.output_file.write("@SP" + "\n")
             self.output_file.write("A=M-1" + "\n")
             if command == "not":
@@ -99,7 +99,7 @@ class CodeWriter:
                 self.output_file.write("M=M<<" + "\n")
             else:
                 self.output_file.write("M=M>>" + "\n")
-        else: # edge case when x,y have different signs, cant load a negative to D register
+        else:  # edge case when x,y have different signs, cant load a negative to D register
             self.output_file.write("@SP" + "\n")
             self.output_file.write("A=M-1" + "\n")
             self.output_file.write("D=M" + "\n")
